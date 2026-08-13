@@ -1,0 +1,69 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "cyclops_utils"
+version = "0.1.0"
+description = "Shared utility functions and tools for OPS workflows"
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+authors = [
+    { name = "Gav Sturm", email = "gav.sturm@czbiohub.org" },
+    { name = "Alex Hillsley", email = "alexander.hillsley@czbiohub.org" },
+    { name = "Mark Potts", email = "mark.potts@czbiohub.org" },
+]
+dependencies = [
+    "numpy",
+    "pandas",
+    "zarr",
+    # data/bbox_utils.py requires iohub.core.registry.set_default_implementation,
+    # which first ships in 0.3.7 (absent in 0.3.0a7).
+    "iohub>=0.3.7",
+    "pyyaml",
+    "tqdm",
+    "joblib",
+    "click",
+    "psutil",
+    "scikit-image",
+    # data/shifts.py imports stitch.connect at module top level. Previously
+    # undeclared and supplied by the monorepo root; resolved via
+    # [tool.uv.sources] in the cyclops-monorepo root.
+    "stitch",
+]
+
+[project.optional-dependencies]
+gpu = [
+    "torch",
+    "cupy-cuda12x",
+    "pynvml",
+    "monai",
+]
+hpc = [
+    "submitit",
+    "dask",
+]
+slack = [
+    "slack-sdk",
+    "python-dotenv",
+    "certifi",
+]
+all = [
+    "cyclops_utils[gpu,hpc,slack]",
+    "torch",
+    "tensorstore",
+    "anndata",
+    "prettytable",
+    "dask",
+]
+
+[project.scripts]
+ops-embedding-status = "cyclops_utils.analysis.embedding_discovery:main"
+
+# Hatch config
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.build.targets.wheel]
+only-include = ["src"]
+sources = ["src"]
